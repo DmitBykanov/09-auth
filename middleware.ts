@@ -6,8 +6,10 @@ const publicRoutes = ["/sign-in", "/sign-up"];
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("accessToken")?.value;
-  const isPrivate = privateRoutes.some((route) => pathname.startsWith(route));
-  const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
+  const isPrivate = privateRoutes.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+  const isPublic = publicRoutes.includes(pathname);
 
   if (!token && isPrivate) {
     const url = req.nextUrl.clone();

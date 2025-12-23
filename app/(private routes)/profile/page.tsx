@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Metadata } from "next";
+import { getMe } from "@/lib/api/clientApi";
 import css from "./ProfilePage.module.css";
 
 export const metadata: Metadata = {
@@ -21,7 +22,13 @@ export const metadata: Metadata = {
   },
 };
 
-const ProfilePage = () => {
+const ProfilePage = async () => {
+  const user = await getMe();
+
+  if (!user) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <main className={css.mainContent}>
       <div className={css.profileCard}>
@@ -34,7 +41,7 @@ const ProfilePage = () => {
 
         <div className={css.avatarWrapper}>
           <Image
-            src="https://ac.goit.global/path/to/avatar.jpg"
+            src={user.avatar}
             alt="User Avatar"
             width={120}
             height={120}
@@ -43,8 +50,8 @@ const ProfilePage = () => {
         </div>
 
         <div className={css.profileInfo}>
-          <p>Username: your_username</p>
-          <p>Email: your_email@example.com</p>
+          <p>Username: {user.username}</p>
+          <p>Email: {user.email}</p>
         </div>
       </div>
     </main>

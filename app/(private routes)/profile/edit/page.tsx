@@ -16,12 +16,16 @@ const EditProfilePage = () => {
 
   useEffect(() => {
     getMe().then((user) => {
+      if (!user) {
+        router.push("/login");
+        return;
+      }
       setUsername(user.username);
       setEmail(user.email);
       setAvatar(user.avatar);
       setLoading(false);
     });
-  }, []);
+  }, [router]);
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -42,13 +46,15 @@ const EditProfilePage = () => {
       <div className={css.profileCard}>
         <h1 className={css.formTitle}>Edit Profile</h1>
 
-        <Image
-          src={avatar || "https://ac.goit.global/path/to/default-avatar.jpg"}
-          alt="User Avatar"
-          width={120}
-          height={120}
-          className={css.avatar}
-        />
+        <div className={css.avatarWrapper}>
+          <Image
+            src={avatar}
+            alt="User Avatar"
+            width={120}
+            height={120}
+            className={css.avatar}
+          />
+        </div>
 
         <form className={css.profileInfo} onSubmit={handleSubmit}>
           <div className={css.usernameWrapper}>
