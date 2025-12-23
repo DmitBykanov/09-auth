@@ -1,33 +1,13 @@
+import { cookies } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
-import { Metadata } from "next";
-import { getMe } from "@/lib/api/clientApi";
+import { getMe } from "@/lib/api/serverApi";
 import css from "./ProfilePage.module.css";
 
-export const metadata: Metadata = {
-  title: "Profile",
-  description: "Your Profile",
-  openGraph: {
-    title: "Profile",
-    description: "Your Profile",
-    url: "https://notehub.com/profile/",
-    images: [
-      {
-        url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
-        width: 1200,
-        height: 630,
-        alt: "NoteHub",
-      },
-    ],
-  },
-};
-
 const ProfilePage = async () => {
-  const user = await getMe();
-
-  if (!user) {
-    return <p>Loading...</p>;
-  }
+  const cookieStore = await cookies();
+  const token = cookieStore.get("accessToken")?.value || "";
+  const user = await getMe(token);
 
   return (
     <main className={css.mainContent}>

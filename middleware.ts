@@ -6,6 +6,7 @@ const publicRoutes = ["/sign-in", "/sign-up"];
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("accessToken")?.value;
+
   const isPrivate = privateRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
   );
