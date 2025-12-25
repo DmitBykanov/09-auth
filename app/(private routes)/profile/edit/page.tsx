@@ -65,7 +65,7 @@ const EditProfilePage = () => {
 
         <div className={css.avatarWrapper}>
           <Image
-            src={avatar || "/default-avatar.png"}
+            src={avatar}
             alt="User Avatar"
             width={120}
             height={120}
