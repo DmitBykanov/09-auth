@@ -5,16 +5,17 @@
   padding: 1rem 2rem;
   background-color: #333;
   color: white;
-  min-height: 60px;
 }
 
-.header a {
+.headerLink {
   text-decoration: none;
   color: white;
   font-size: 1.5rem;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
+  font-weight: 700;
+}
+
+.headerLink:hover {
+  color: #ddd;
 }
 
 .navigation {
@@ -22,25 +23,20 @@
   margin: 0;
   padding: 0;
   display: flex;
-  align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
-.navigation li {
+.navigationItem {
   display: flex;
   align-items: center;
 }
 
-.navigation li a {
+.navigationLink {
   text-decoration: none;
   color: white;
   font-size: 1rem;
-  line-height: 1;
-  display: flex;
-  align-items: center;
 }
 
-.header a:hover,
-.navigation li a:hover {
+.navigationLink:hover {
   color: #ddd;
 }
