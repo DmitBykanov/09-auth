@@ -5,6 +5,7 @@
   padding: 1rem 2rem;
   background-color: #333;
   color: white;
+  min-height: 60px;
 }
 
 .header a {
@@ -12,10 +13,8 @@
   color: white;
   font-size: 1.5rem;
   font-weight: bold;
-}
-
-.header a:hover {
-  color: #ddd;
+  display: flex;
+  align-items: center;
 }
 
 .navigation {
@@ -23,15 +22,25 @@
   margin: 0;
   padding: 0;
   display: flex;
-  gap: 1rem;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navigation li {
+  display: flex;
+  align-items: center;
 }
 
 .navigation li a {
   text-decoration: none;
   color: white;
   font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
 }
 
+.header a:hover,
 .navigation li a:hover {
   color: #ddd;
 }
