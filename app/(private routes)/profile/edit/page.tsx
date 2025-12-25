@@ -5,9 +5,12 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import css from "./EditProfilePage.module.css";
 import { getMe, updateMe } from "@/lib/api/clientApi";
+import { useAuthStore } from "@/lib/store/authStore";
 
 const EditProfilePage = () => {
   const router = useRouter();
+  const { setUser } = useAuthStore();
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [avatar, setAvatar] = useState("");
@@ -15,31 +18,45 @@ const EditProfilePage = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    getMe().then((user) => {
-      if (!user) {
-        router.push("/login");
-        return;
-      }
-      setUsername(user.username);
-      setEmail(user.email);
-      setAvatar(user.avatar);
-      setLoading(false);
-    });
+    getMe()
+      .then((user) => {
+        if (!user) {
+          router.push("/sign-in");
+          return;
+        }
+        setUsername(user.username);
+        setEmail(user.email);
+        setAvatar(user.avatar);
+      })
+      .catch(() => {
+        router.push("/sign-in");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [router]);
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setSaving(true);
-    updateMe({ username }).then(() => {
+
+    try {
+      const updatedUser = await updateMe({ username });
+      setUser(updatedUser);
       router.push("/profile");
-    });
+    } catch (error) {
+      console.error("Failed to update profile", error);
+      alert("Something went wrong while saving.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
     router.push("/profile");
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <div className={css.loader}>Loading...</div>;
 
   return (
     <main className={css.mainContent}>
@@ -48,11 +65,12 @@ const EditProfilePage = () => {
 
         <div className={css.avatarWrapper}>
           <Image
-            src={avatar}
+            src={avatar || "/default-avatar.png"}
             alt="User Avatar"
             width={120}
             height={120}
             className={css.avatar}
+            priority
           />
         </div>
 
@@ -69,7 +87,7 @@ const EditProfilePage = () => {
             />
           </div>
 
-          <p>Email: {email}</p>
+          <p className={css.emailText}>Email: {email}</p>
 
           <div className={css.actions}>
             <button type="submit" className={css.saveButton} disabled={saving}>
@@ -79,6 +97,7 @@ const EditProfilePage = () => {
               type="button"
               className={css.cancelButton}
               onClick={handleCancel}
+              disabled={saving}
             >
               Cancel
             </button>

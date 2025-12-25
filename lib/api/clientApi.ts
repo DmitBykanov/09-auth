@@ -70,13 +70,13 @@ export const checkSession = async (): Promise<User | null> => {
 };
 
 export const getMe = async (): Promise<User> => {
-  const { data } = await api.get<User>("/auth/me");
+  const { data } = await api.get<User>("/users/me");
   return data;
 };
 
 export const updateMe = async (
   updateData: Partial<User> & { password?: string }
 ): Promise<User> => {
-  const { data } = await api.put<User>("/auth/me", updateData);
+  const { data } = await api.patch<User>("/users/me", updateData);
   return data;
 };

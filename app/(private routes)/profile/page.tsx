@@ -1,13 +1,20 @@
-import { cookies } from "next/headers";
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getMe } from "@/lib/api/serverApi";
 import css from "./ProfilePage.module.css";
 
+export const metadata: Metadata = {
+  title: "Profile | NoteHub",
+  description: "User profile page on NoteHub",
+};
+
 const ProfilePage = async () => {
-  const cookieStore = await cookies();
-  const token = cookieStore.get("accessToken")?.value || "";
-  const user = await getMe(token);
+  const user = await getMe();
+  if (!user) {
+    redirect("/sign-in");
+  }
 
   return (
     <main className={css.mainContent}>
@@ -26,12 +33,17 @@ const ProfilePage = async () => {
             width={120}
             height={120}
             className={css.avatar}
+            priority
           />
         </div>
 
         <div className={css.profileInfo}>
-          <p>Username: {user.username}</p>
-          <p>Email: {user.email}</p>
+          <p>
+            <strong>Username:</strong> {user.username}
+          </p>
+          <p>
+            <strong>Email:</strong> {user.email}
+          </p>
         </div>
       </div>
     </main>

@@ -2,32 +2,44 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { isAxiosError } from "axios";
 import css from "./SignUpPage.module.css";
 import { register } from "@/lib/api/clientApi";
+import { useAuthStore } from "@/lib/store/authStore";
+import { ApiError } from "@/lib/api/api";
 
 const SignUpPage = () => {
   const router = useRouter();
+  const setUser = useAuthStore((state) => state.setUser);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setLoading(true);
     setError("");
 
-    const payload: { email: string; password: string } = { email, password };
-
-    register(payload)
-      .then(() => {
-        router.push("/profile");
-      })
-      .catch(() => {
-        setError("Registration failed. Please try again.");
-        setLoading(false);
-      });
+    try {
+      const payload = { email, password };
+      const user = await register(payload);
+      setUser(user);
+      router.push("/profile");
+    } catch (err) {
+      if (isAxiosError(err)) {
+        const axiosError = err as ApiError;
+        setError(
+          axiosError.response?.data?.error ||
+            "Registration failed. Please try again."
+        );
+      } else {
+        setError("An unexpected error occurred.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,10 +51,12 @@ const SignUpPage = () => {
           <input
             id="email"
             type="email"
+            name="email"
             className={css.input}
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="example@mail.com"
           />
         </div>
 
@@ -51,10 +65,12 @@ const SignUpPage = () => {
           <input
             id="password"
             type="password"
+            name="password"
             className={css.input}
             required
             value={password}
-            onChange={(event) => setPassword(event.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
           />
         </div>
 

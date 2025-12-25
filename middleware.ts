@@ -5,7 +5,9 @@ const publicRoutes = ["/sign-in", "/sign-up"];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-  const token = req.cookies.get("accessToken")?.value;
+  const token =
+    req.cookies.get("accessToken")?.value ||
+    req.cookies.get("refreshToken")?.value;
 
   const isPrivate = privateRoutes.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`)
@@ -13,15 +15,11 @@ export function middleware(req: NextRequest) {
   const isPublic = publicRoutes.includes(pathname);
 
   if (!token && isPrivate) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/sign-in";
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
   if (token && isPublic) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/profile";
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL("/profile", req.url));
   }
 
   return NextResponse.next();

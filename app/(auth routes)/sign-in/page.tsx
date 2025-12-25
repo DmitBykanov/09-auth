@@ -2,30 +2,41 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { isAxiosError } from "axios";
 import css from "./SignInPage.module.css";
 import { login } from "@/lib/api/clientApi";
+import { useAuthStore } from "@/lib/store/authStore";
+import { ApiError } from "@/lib/api/api";
 
 const SignInPage = () => {
   const router = useRouter();
-
+  const setUser = useAuthStore((state) => state.setUser);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const handleSubmit = (event: FormEvent) => {
+  const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setLoading(true);
     setError("");
 
-    login({ email, password })
-      .then(() => {
-        router.push("/profile");
-      })
-      .catch(() => {
-        setError("Login failed. Please check your credentials.");
-        setLoading(false);
-      });
+    try {
+      const user = await login({ email, password });
+      setUser(user);
+      router.push("/profile");
+    } catch (err) {
+      if (isAxiosError(err)) {
+        const axiosError = err as ApiError;
+        setError(
+          axiosError.response?.data?.error ||
+            "Login failed. Please check your credentials."
+        );
+      } else {
+        setError("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,7 +52,8 @@ const SignInPage = () => {
             className={css.input}
             required
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="example@mail.com"
           />
         </div>
 
@@ -53,7 +65,8 @@ const SignInPage = () => {
             className={css.input}
             required
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="••••••••"
           />
         </div>
 
